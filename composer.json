@@ -1,0 +1,82 @@
+{
+    "name": "ubayedtanvir/laravel-tenancy",
+    "description": "Single-database multi-tenancy for Laravel that fails closed—and just works. Teams when you need them, users when you don't.",
+    "keywords": [
+        "laravel",
+        "laravel-package",
+        "laravel-tenancy",
+        "micro-saas",
+        "multi-tenancy",
+        "single-database",
+        "tenancy",
+        "tenancy-for-laravel"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abdullah Ubayed Tanvir",
+            "email": "ubayed.tanvir@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "*"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "^2.0",
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.27",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "pestphp/pest-plugin-type-coverage": "^4.0",
+        "orchestra/testbench": "^11.0",
+        "mockery/mockery": "^1.6.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "UbayedTanvir\\LaravelTenancy\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "UbayedTanvir\\LaravelTenancy\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "lint": "pint --parallel --ansi",
+        "test": [
+            "@test:refactor",
+            "@test:lint",
+            "@test:types",
+            "@test:type-coverage",
+            "pest --parallel"
+        ],
+        "test:lint": "pint --parallel --test",
+        "test:types": "phpstan analyse --verbose --ansi",
+        "test:type-coverage": "pest --type-coverage --exactly=100",
+        "test:refactor": "rector --dry-run",
+        "refactor": "rector"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "UbayedTanvir\\LaravelTenancy\\TenancyServiceProvider"
+            ],
+            "aliases": {
+                "Tenancy": "UbayedTanvir\\LaravelTenancy\\Facades\\Tenancy"
+            }
+        }
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
