@@ -5,4 +5,5 @@ parameters:
     level: 10
     paths:
         - src
+        - tests/Fixtures
     treatPhpDocTypesAsCertain: false

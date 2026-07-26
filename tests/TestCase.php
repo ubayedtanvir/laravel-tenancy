@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace UbayedTanvir\LaravelTenancy\Tests;
 
-use App\Models\User;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use UbayedTanvir\LaravelTenancy\TenancyManager;
 use UbayedTanvir\LaravelTenancy\TenancyServiceProvider;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Tenant;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -26,13 +27,20 @@ abstract class TestCase extends BaseTestCase
      */
     protected function defineEnvironment($app): void
     {
-        $app->make(Repository::class)->set('database.default', 'testing');
-        $app->make(Repository::class)->set('database.connections.testing', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
+        $app->make(Repository::class)->set('tenancy.tenant.model', Tenant::class);
+    }
 
-        $app->make(Repository::class)->set('tenancy.tenant.model', User::class);
+    protected function defineDatabaseMigrations(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/Fixtures/migrations');
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->app?->resolved(TenancyManager::class)) {
+            $this->app->make(TenancyManager::class)->end();
+        }
+
+        parent::tearDown();
     }
 }

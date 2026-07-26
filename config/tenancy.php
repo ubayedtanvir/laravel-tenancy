@@ -24,10 +24,10 @@ return [
         'model' => env('TENANCY_MODEL', 'App\\Models\\User'),
 
         // The foreign key for the tenant model
-        'foreign_key' => 'user_id',
+        'foreign_key' => null,
 
         // model key type (uuid|ulid|id|bigInteger|string)
-        'key_type' => 'uuid',
+        'key_type' => null,
 
         // only used for plain-string keys
         'key_length' => 36,

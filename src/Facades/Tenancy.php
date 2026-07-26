@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace UbayedTanvir\LaravelTenancy\Facades;
+
+use Illuminate\Support\Facades\Facade;
+use UbayedTanvir\LaravelTenancy\TenancyManager;
+
+/**
+ * @method static void initialize(\UbayedTanvir\LaravelTenancy\Contracts\IsTenant $tenant)
+ * @method static void end()
+ * @method static \UbayedTanvir\LaravelTenancy\Contracts\IsTenant|null current()
+ * @method static \UbayedTanvir\LaravelTenancy\Contracts\IsTenant currentOrFail()
+ * @method static int|string|null id()
+ * @method static int|string idOrFail()
+ * @method static bool check()
+ * @method static bool is(\UbayedTanvir\LaravelTenancy\Contracts\IsTenant|int|string $tenant)
+ * @method static bool strict()
+ * @method static bool crossTenantEnabled()
+ * @method static mixed crossTenant(\Closure $callback)
+ * @method static mixed runFor(\UbayedTanvir\LaravelTenancy\Contracts\IsTenant $tenant, \Closure $callback)
+ * @method static void each(\Closure $callback, int $chunk = 100)
+ * @method static void resolveUsing(\Closure $callback)
+ * @method static \Closure|null customResolver()
+ * @method static string foreignKey()
+ *
+ * @see TenancyManager
+ */
+final class Tenancy extends Facade
+{
+    protected static function getFacadeAccessor(): string
+    {
+        return TenancyManager::class;
+    }
+}
