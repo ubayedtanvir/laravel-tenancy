@@ -61,6 +61,11 @@ final class TenancyManager
         event(new TenancyEnded($previous));
     }
 
+    public function initialized(): bool
+    {
+        return $this->isTenant instanceof IsTenant;
+    }
+
     public function current(): ?IsTenant
     {
         return $this->isTenant;
@@ -81,11 +86,6 @@ final class TenancyManager
         return $this->currentOrFail()->getKey();
     }
 
-    public function check(): bool
-    {
-        return $this->isTenant instanceof IsTenant;
-    }
-
     public function is(IsTenant|int|string $tenant): bool
     {
         if (! $this->isTenant instanceof IsTenant) {
@@ -97,7 +97,7 @@ final class TenancyManager
         return (string) $this->isTenant->getKey() === (string) $key;
     }
 
-    public function strict(): bool
+    public function strictModeEnabled(): bool
     {
         return config()->boolean('tenancy.strict', default: true);
     }
@@ -148,6 +148,24 @@ final class TenancyManager
     }
 
     /**
+     * The tenant foreign key for a specific model: the value it reports through
+     * BelongsToTenant (which honours a per-model $tenantForeignKey override),
+     * else the global convention.
+     */
+    public function foreignKeyFor(Model $model): string
+    {
+        if (method_exists($model, 'getTenantForeignKey')) {
+            $column = $model->getTenantForeignKey();
+
+            if (\is_string($column) && $column !== '') {
+                return $column;
+            }
+        }
+
+        return $this->foreignKey();
+    }
+
+    /**
      * Run a callback for every tenant, chunked.
      *
      * @param  Closure(IsTenant): void  $callback
@@ -190,7 +208,7 @@ final class TenancyManager
     {
         $configured = config('tenancy.tenant.foreign_key');
 
-        if (is_string($configured) && $configured !== '') {
+        if (\is_string($configured) && $configured !== '') {
             return $configured;
         }
 
@@ -202,7 +220,7 @@ final class TenancyManager
         $class = config('tenancy.tenant.model');
 
         throw_if(
-            ! is_string($class) || ! is_subclass_of($class, Model::class),
+            ! \is_string($class) || ! is_subclass_of($class, Model::class),
             TenantContextMissing::class,
             'No tenant model configured. Set tenancy.tenant.model (run `php artisan tenancy:install`).'
         );

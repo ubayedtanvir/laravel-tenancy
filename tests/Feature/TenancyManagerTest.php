@@ -16,7 +16,7 @@ it('binds and reflects the current tenant', function (): void {
 
     Tenancy::initialize($tenant);
 
-    expect(Tenancy::check())->toBeTrue()
+    expect(Tenancy::initialized())->toBeTrue()
         ->and(Tenancy::current()?->getKey())->toBe($tenant->getKey())
         ->and(Tenancy::id())->toBe($tenant->getKey())
         ->and(Context::get('tenant_id'))->toBe($tenant->getKey());
@@ -26,7 +26,7 @@ it('clears context on end', function (): void {
     Tenancy::initialize(Tenant::query()->create(['slug' => 'acme']));
     Tenancy::end();
 
-    expect(Tenancy::check())->toBeFalse()
+    expect(Tenancy::initialized())->toBeFalse()
         ->and(Tenancy::id())->toBeNull()
         ->and(Context::get('tenant_id'))->toBeNull();
 });
@@ -65,7 +65,7 @@ it('`runFor()` restores the no-tenant state', function (): void {
 
     Tenancy::runFor($tenant, fn (): null => null);
 
-    expect(Tenancy::check())->toBeFalse();
+    expect(Tenancy::initialized())->toBeFalse();
 });
 
 it('`runFor()` restores even when the callback throws', function (): void {
@@ -79,7 +79,7 @@ it('`runFor()` restores even when the callback throws', function (): void {
         // expected
     }
 
-    expect(Tenancy::check())->toBeFalse();
+    expect(Tenancy::initialized())->toBeFalse();
 });
 
 it('`crossTenant()` suspends, nests, and restores', function (): void {
@@ -152,7 +152,7 @@ it('runs a callback for every tenant and ends after', function (): void {
     sort($seen);
 
     expect($seen)->toBe(['a', 'b', 'c'])
-        ->and(Tenancy::check())->toBeFalse();
+        ->and(Tenancy::initialized())->toBeFalse();
 });
 
 it('derives the tenant foreign key from convention', function (): void {
