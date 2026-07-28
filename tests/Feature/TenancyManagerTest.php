@@ -9,7 +9,7 @@ use UbayedTanvir\LaravelTenancy\Events\TenancyEnded;
 use UbayedTanvir\LaravelTenancy\Events\TenancyInitialized;
 use UbayedTanvir\LaravelTenancy\Exceptions\TenantContextMissing;
 use UbayedTanvir\LaravelTenancy\Facades\Tenancy;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Tenant;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Tenant;
 
 it('binds and reflects the current tenant', function (): void {
     $tenant = Tenant::query()->create(['slug' => 'acme']);

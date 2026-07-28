@@ -9,7 +9,7 @@ use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use UbayedTanvir\LaravelTenancy\TenancyManager;
 use UbayedTanvir\LaravelTenancy\TenancyServiceProvider;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Tenant;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Tenant;
 
 abstract class TestCase extends BaseTestCase
 {

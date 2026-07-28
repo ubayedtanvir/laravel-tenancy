@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UbayedTanvir\LaravelTenancy\Tests\Fixtures;
+namespace UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use UbayedTanvir\LaravelTenancy\Concerns\HasTenants;

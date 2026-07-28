@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace UbayedTanvir\LaravelTenancy;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\ServiceProvider;
+use UbayedTanvir\LaravelTenancy\Database\TenancyBlueprintMacros;
 
 final class TenancyServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,8 @@ final class TenancyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Blueprint::mixin(new TenancyBlueprintMacros);
+
         if ($this->app->runningInConsole()) {
             $this->publishes(
                 [__DIR__.'/../config/tenancy.php' => config_path('tenancy.php')],

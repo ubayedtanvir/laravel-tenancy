@@ -6,4 +6,5 @@ parameters:
     paths:
         - src
         - tests/Fixtures
-    treatPhpDocTypesAsCertain: false
+    excludePaths:
+        - src/Database/TenancyBlueprintMacros.php

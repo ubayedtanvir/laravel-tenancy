@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Log;
 use UbayedTanvir\LaravelTenancy\Database\LenientModeWarning;
 use UbayedTanvir\LaravelTenancy\Exceptions\TenantContextMissing;
 use UbayedTanvir\LaravelTenancy\Facades\Tenancy;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Comment;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\LegacyPost;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Post;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Tenant;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Comment;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\LegacyPost;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Post;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Tenant;
 
 it('filters reads to the current tenant', function (): void {
     $tenant = Tenant::query()->create(['slug' => 'a']);

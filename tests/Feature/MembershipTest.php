@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Tenant;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\User;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Tenant;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\User;
 
 it('reports tenant membership through `HasTenants`', function (): void {
     $tenant = Tenant::query()->create(['slug' => 'a']);

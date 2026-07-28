@@ -16,8 +16,10 @@ use UbayedTanvir\LaravelTenancy\Tests\TestCase;
 |
 */
 
-pest()->extend(TestCase::class)
-    ->use(RefreshDatabase::class)
+uses(TestCase::class)
+    ->in(__DIR__);
+
+pest()->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*

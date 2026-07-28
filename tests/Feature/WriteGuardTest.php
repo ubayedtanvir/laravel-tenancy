@@ -6,8 +6,8 @@ use UbayedTanvir\LaravelTenancy\Exceptions\CrossTenantWriteDenied;
 use UbayedTanvir\LaravelTenancy\Exceptions\TenantContextMissing;
 use UbayedTanvir\LaravelTenancy\Exceptions\TenantOwnershipImmutable;
 use UbayedTanvir\LaravelTenancy\Facades\Tenancy;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Post;
-use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Tenant;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Post;
+use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Tenant;
 
 it('stamps the current tenant on create', function (): void {
     $tenant = Tenant::query()->create(['slug' => 'a']);
