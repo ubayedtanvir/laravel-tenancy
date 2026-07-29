@@ -10,23 +10,19 @@ use UbayedTanvir\LaravelTenancy\Contracts\TenantRepository;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantResolver;
 
 /**
- * Resolves the tenant from a named route parameter.
+ * Resolves the tenant from a request header.
  */
-final readonly class PathTenantResolver implements TenantResolver
+final readonly class HeaderTenantResolver implements TenantResolver
 {
     public function __construct(private TenantRepository $tenantRepository) {}
 
     /**
-     * Resolve the tenant from the request's route parameter.
+     * Resolve the tenant from the configured request header.
      */
     public function resolve(Request $request): ?IsTenant
     {
-        $parameter = config('tenancy.route_parameter', 'tenant');
-        $key = $request->route(\is_string($parameter) ? $parameter : 'tenant');
-
-        if ($key instanceof IsTenant) {
-            return $key;
-        }
+        $header = config('tenancy.header', 'X-Tenant');
+        $key = $request->header(\is_string($header) ? $header : 'X-Tenant');
 
         return \is_string($key) && $key !== ''
             ? $this->tenantRepository->findByRouteKey($key)

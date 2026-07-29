@@ -13,7 +13,7 @@ use Illuminate\Database\Schema\ColumnDefinition;
  *
  * @mixin Blueprint
  */
-final class TenancyBlueprintMacros
+final class SchemaBlueprintMixin
 {
     /**
      * Add a tenant column with an index and a cascading foreign key.

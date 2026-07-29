@@ -122,7 +122,11 @@ final class TenantColumn
     {
         $class = config('tenancy.tenant.model');
 
-        throw_if(! \is_string($class) || ! is_subclass_of($class, Model::class), TenancyException::class, 'No tenant model configured. Run `php artisan tenancy:install`.');
+        throw_if(
+            ! \is_string($class) || ! is_subclass_of($class, Model::class),
+            TenancyException::class,
+            'No tenant model configured. Run `php artisan tenancy:install`.'
+        );
 
         return new $class;
     }
