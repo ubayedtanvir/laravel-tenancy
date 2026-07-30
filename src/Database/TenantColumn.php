@@ -12,10 +12,7 @@ use Illuminate\Database\Schema\ColumnDefinition;
 use UbayedTanvir\LaravelTenancy\Exceptions\TenancyException;
 
 /**
- * Resolves the tenant model's key metadata into a correctly-typed migration
- * column. The single source of truth for "what shape is the tenant column".
- *
- * @internal Use $table->tenant() / $table->tenantKey() / $table->currentTenant().
+ * @internal
  */
 final class TenantColumn
 {
@@ -30,8 +27,7 @@ final class TenantColumn
     public const string STRING = 'string';
 
     /**
-     * Add a correctly-typed tenant column to a blueprint (column only — the
-     * index and foreign key are added by the macros).
+     * Add a tenant foreign key column to the given blueprint.
      */
     public static function add(Blueprint $blueprint, ?string $column = null): ColumnDefinition
     {
@@ -48,8 +44,7 @@ final class TenantColumn
     }
 
     /**
-     * Resolution order: explicit config, then trait, then Eloquent's own key
-     * metadata. Never a silent fallback — an unclassifiable key throws.
+     * Determine the tenant model's key type.
      */
     public static function keyType(?Model $model = null): string
     {
@@ -79,7 +74,7 @@ final class TenantColumn
     }
 
     /**
-     * Human-readable, for tenancy:install and tenancy:audit.
+     * Get a human-readable description of the tenant key type.
      */
     public static function describe(?Model $model = null): string
     {
@@ -104,7 +99,6 @@ final class TenantColumn
             return $configured;
         }
 
-        // Laravel's own BelongsTo convention: Team -> team_id.
         return ($model ?? self::model())->getForeignKey();
     }
 

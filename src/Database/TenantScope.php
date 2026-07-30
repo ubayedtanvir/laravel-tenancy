@@ -11,9 +11,6 @@ use UbayedTanvir\LaravelTenancy\Exceptions\TenantContextMissing;
 use UbayedTanvir\LaravelTenancy\TenancyManager;
 
 /**
- * Filters every read of a scoped model to the bound tenant — or, in strict
- * mode, throws when no tenant is bound rather than leaking every tenant's rows.
- *
  * @template TModel of Model
  *
  * @implements Scope<TModel>
@@ -45,9 +42,7 @@ final class TenantScope implements Scope
             return;
         }
 
-        // qualifyColumn, not the bare name: without it, a query joining two
-        // scoped tables raises "ambiguous column tenant_id" — and the fix a
-        // developer reaches for under pressure is withoutGlobalScope().
+        // Qualified to avoid ambiguity when joining multiple scoped tables.
         $builder->where(
             $model->qualifyColumn($tenancyManager->foreignKeyFor($model)),
             $tenancyManager->idOrFail(),

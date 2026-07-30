@@ -19,10 +19,8 @@ final class TenancyManager
 {
     use Macroable;
 
-    /** The current tenant */
     private ?IsTenant $isTenant = null;
 
-    /** Depth, not a boolean — crossTenant() calls nest. */
     private int $crossTenantDepth = 0;
 
     /** @var (Closure(Request): (IsTenant|null))|null */
@@ -147,11 +145,6 @@ final class TenancyManager
         }
     }
 
-    /**
-     * The tenant foreign key for a specific model: the value it reports through
-     * BelongsToTenant (which honours a per-model $tenantForeignKey override),
-     * else the global convention.
-     */
     public function foreignKeyFor(Model $model): string
     {
         if (method_exists($model, 'getTenantForeignKey')) {
@@ -200,10 +193,6 @@ final class TenancyManager
         return $this->customResolver;
     }
 
-    /**
-     * The tenant foreign key: configured value, else Laravel's own BelongsTo
-     * convention on the tenant model (Team => team_id).
-     */
     public function foreignKey(): string
     {
         $configured = config('tenancy.tenant.foreign_key');

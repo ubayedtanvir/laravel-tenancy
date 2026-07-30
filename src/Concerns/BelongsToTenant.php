@@ -74,16 +74,13 @@ trait BelongsToTenant
     }
 
     /**
-     * Never fillable. A request body can never choose a row's tenant.
+     * Guard the tenant foreign key against mass assignment.
      */
     public function initializeBelongsToTenant(): void
     {
         $this->mergeGuarded([$this->getTenantForeignKey()]);
     }
 
-    /**
-     * Read the per-model override in-class, otherwise the default.
-     */
     public function getTenantForeignKey(): string
     {
         if (property_exists($this, 'tenantForeignKey')
@@ -118,8 +115,6 @@ trait BelongsToTenant
     }
 
     /**
-     * Alias — reads better in aggregate queries.
-     *
      * @param  Builder<Model>  $builder
      * @return Builder<Model>
      */

@@ -7,12 +7,16 @@ namespace UbayedTanvir\LaravelTenancy;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantRepository;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantResolver;
 use UbayedTanvir\LaravelTenancy\Database\EloquentTenantRepository;
 use UbayedTanvir\LaravelTenancy\Database\SchemaBlueprintMixin;
 use UbayedTanvir\LaravelTenancy\Database\TenantCacheInvalidator;
+use UbayedTanvir\LaravelTenancy\Http\Middleware\EnsureTenantMember;
+use UbayedTanvir\LaravelTenancy\Http\Middleware\IdentifyTenant;
+use UbayedTanvir\LaravelTenancy\Http\Middleware\RequireTenant;
 
 final class TenancyServiceProvider extends ServiceProvider
 {
@@ -20,11 +24,8 @@ final class TenancyServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/tenancy.php', 'tenancy');
 
-        // `scoped()` bindings are flushed between requests.
         $this->app->scoped(TenancyManager::class);
 
-        // Reachable through both the contract and the concrete class, so the
-        // cache-invalidation listener and the resolvers share its memo.
         $this->app->scoped(EloquentTenantRepository::class);
         $this->app->alias(EloquentTenantRepository::class, TenantRepository::class);
 
@@ -35,6 +36,7 @@ final class TenancyServiceProvider extends ServiceProvider
     {
         Blueprint::mixin(new SchemaBlueprintMixin);
 
+        $this->registerMiddlewareAliases();
         $this->registerTenantCacheInvalidation();
 
         if ($this->app->runningInConsole()) {
@@ -45,9 +47,15 @@ final class TenancyServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register model event listeners to invalidate the route-key cache on save and delete.
-     */
+    private function registerMiddlewareAliases(): void
+    {
+        $router = $this->app->make(Router::class);
+
+        $router->aliasMiddleware('tenant', IdentifyTenant::class);
+        $router->aliasMiddleware('tenant.required', RequireTenant::class);
+        $router->aliasMiddleware('tenant.member', EnsureTenantMember::class);
+    }
+
     private function registerTenantCacheInvalidation(): void
     {
         $model = config('tenancy.tenant.model');

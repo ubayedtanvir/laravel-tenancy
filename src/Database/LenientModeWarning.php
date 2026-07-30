@@ -7,10 +7,6 @@ namespace UbayedTanvir\LaravelTenancy\Database;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Lenient mode (strict = false) is a migration aid, not an operating mode.
- * When a scoped model is queried with no tenant bound, warn once per model per
- * process so the fail-open behaviour cannot be adopted silently.
- *
  * @internal
  */
 final class LenientModeWarning
