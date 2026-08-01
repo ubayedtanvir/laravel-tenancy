@@ -13,6 +13,8 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 use UbayedTanvir\LaravelTenancy\Cache\TenantCache;
+use UbayedTanvir\LaravelTenancy\Console\AuditCommand;
+use UbayedTanvir\LaravelTenancy\Console\InstallCommand;
 use UbayedTanvir\LaravelTenancy\Console\RunCommand;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantRepository;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantResolver;
@@ -57,6 +59,8 @@ final class TenancyServiceProvider extends ServiceProvider
             );
 
             $this->commands([
+                InstallCommand::class,
+                AuditCommand::class,
                 RunCommand::class,
             ]);
         }

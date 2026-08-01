@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $blueprint): void {
             $blueprint->id();
-            $blueprint->foreignId('tenant_id');
+            $blueprint->tenant();
             $blueprint->string('title')->nullable();
             $blueprint->timestamps();
         });

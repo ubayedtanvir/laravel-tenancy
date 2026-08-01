@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('legacy_posts', function (Blueprint $blueprint): void {
             $blueprint->id();
-            $blueprint->foreignId('account_id');
+            $blueprint->tenant('account_id');
             $blueprint->string('title')->nullable();
             $blueprint->timestamps();
         });
