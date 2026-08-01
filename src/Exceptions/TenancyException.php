@@ -7,7 +7,6 @@ namespace UbayedTanvir\LaravelTenancy\Exceptions;
 use RuntimeException;
 
 /**
- * Base exception for the package. Catch this to catch everything the package
- * throws.
+ * Base exception for all tenancy-related errors.
  */
 class TenancyException extends RuntimeException {}

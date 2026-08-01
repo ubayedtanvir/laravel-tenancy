@@ -159,8 +159,6 @@ final class TenancyManager
     }
 
     /**
-     * Run a callback for every tenant, chunked.
-     *
      * @param  Closure(IsTenant): void  $callback
      */
     public function each(Closure $callback, int $chunk = 100): void

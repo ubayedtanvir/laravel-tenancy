@@ -18,9 +18,6 @@ final readonly class ChainTenantResolver implements TenantResolver
      */
     public function __construct(private array $resolvers) {}
 
-    /**
-     * Resolve the tenant by delegating to each resolver in order.
-     */
     public function resolve(Request $request): ?IsTenant
     {
         foreach ($this->resolvers as $resolver) {

@@ -19,9 +19,6 @@ final class EloquentTenantRepository implements TenantRepository
      */
     private array $memo = [];
 
-    /**
-     * Find a tenant by its route key, and cache the primary key.
-     */
     public function findByRouteKey(string $key): ?IsTenant
     {
         if (\array_key_exists($key, $this->memo)) {
@@ -50,9 +47,6 @@ final class EloquentTenantRepository implements TenantRepository
         return $this->memo[$key] = ($cached === false) ? null : $this->findByKey($cached);
     }
 
-    /**
-     * Find a tenant by its primary key.
-     */
     public function findByKey(int|string $id): ?IsTenant
     {
         $tenant = TenantColumn::model()->newQuery()->whereKey($id)->first();
@@ -60,17 +54,11 @@ final class EloquentTenantRepository implements TenantRepository
         return $tenant instanceof IsTenant ? $tenant : null;
     }
 
-    /**
-     * Remove a tenant from the route-key cache.
-     */
     public function forget(IsTenant $isTenant): void
     {
         $this->forgetByRouteKey($isTenant->getRouteKey());
     }
 
-    /**
-     * Remove a specific route key from the cache.
-     */
     public function forgetByRouteKey(string $key): void
     {
         unset($this->memo[$key]);

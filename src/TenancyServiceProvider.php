@@ -16,6 +16,9 @@ use UbayedTanvir\LaravelTenancy\Database\SchemaBlueprintMixin;
 use UbayedTanvir\LaravelTenancy\Database\TenantCacheInvalidator;
 use UbayedTanvir\LaravelTenancy\Http\Middleware\EnsureTenantMember;
 use UbayedTanvir\LaravelTenancy\Http\Middleware\IdentifyTenant;
+use UbayedTanvir\LaravelTenancy\Http\Middleware\RecordsCurrentTenant;
+use UbayedTanvir\LaravelTenancy\Http\Middleware\RedirectToCurrentTenant;
+use UbayedTanvir\LaravelTenancy\Http\Middleware\RequireExplicitSwitch;
 use UbayedTanvir\LaravelTenancy\Http\Middleware\RequireTenant;
 
 final class TenancyServiceProvider extends ServiceProvider
@@ -54,6 +57,9 @@ final class TenancyServiceProvider extends ServiceProvider
         $router->aliasMiddleware('tenant', IdentifyTenant::class);
         $router->aliasMiddleware('tenant.required', RequireTenant::class);
         $router->aliasMiddleware('tenant.member', EnsureTenantMember::class);
+        $router->aliasMiddleware('tenant.record', RecordsCurrentTenant::class);
+        $router->aliasMiddleware('tenant.landing', RedirectToCurrentTenant::class);
+        $router->aliasMiddleware('tenant.strict-switch', RequireExplicitSwitch::class);
     }
 
     private function registerTenantCacheInvalidation(): void

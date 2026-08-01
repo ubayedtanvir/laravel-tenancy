@@ -14,6 +14,7 @@ return new class extends Migration
             $blueprint->id();
             $blueprint->string('name')->nullable();
             $blueprint->string('email')->nullable();
+            $blueprint->currentTenant();
             $blueprint->timestamps();
         });
     }

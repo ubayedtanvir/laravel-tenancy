@@ -16,9 +16,6 @@ final readonly class PathTenantResolver implements TenantResolver
 {
     public function __construct(private TenantRepository $tenantRepository) {}
 
-    /**
-     * Resolve the tenant from the request's route parameter.
-     */
     public function resolve(Request $request): ?IsTenant
     {
         $parameter = config('tenancy.route_parameter', 'tenant');

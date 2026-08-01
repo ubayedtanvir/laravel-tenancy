@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 use RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector;
 use RectorLaravel\Set\LaravelSetList;
 
@@ -41,6 +42,9 @@ return RectorConfig::configure()
     )
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        AddGenericReturnTypeToRelationsRector::class => [
+            __DIR__.'/src/Concerns/HasTenants.php',
+        ],
     ])
     ->withConfiguredRule(RemoveDumpDataDeadCodeRector::class, [
         'dd', 'dump', 'var_dump', 'var_export',

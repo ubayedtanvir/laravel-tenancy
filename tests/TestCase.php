@@ -27,6 +27,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function defineEnvironment($app): void
     {
+        // Required by middleware tests that use the 'web' group (session encryption).
+        $app->make(Repository::class)->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
         $app->make(Repository::class)->set('tenancy.tenant.model', Tenant::class);
     }
 

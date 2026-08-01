@@ -6,6 +6,7 @@ namespace UbayedTanvir\LaravelTenancy\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use UbayedTanvir\LaravelTenancy\Contracts\IsTenant;
 
 /**
@@ -17,11 +18,11 @@ use UbayedTanvir\LaravelTenancy\Contracts\IsTenant;
 trait HasTenants
 {
     /**
-     * @return BelongsToMany<Model, $this>
+     * @return BelongsToMany<Model&IsTenant, $this, Pivot>
      */
     public function tenants(): BelongsToMany
     {
-        /** @var class-string<Model> $model */
+        /** @var class-string<Model&IsTenant> $model */
         $model = config('tenancy.tenant.model');
 
         return $this->belongsToMany($model);

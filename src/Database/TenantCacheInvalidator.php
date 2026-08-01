@@ -14,8 +14,6 @@ final readonly class TenantCacheInvalidator
     public function __construct(private EloquentTenantRepository $eloquentTenantRepository) {}
 
     /**
-     * Register saved and deleted listeners on the given tenant model class.
-     *
      * @param  class-string<Model>  $model
      */
     public function register(string $model): void
@@ -24,9 +22,6 @@ final readonly class TenantCacheInvalidator
         $model::deleted($this->onDelete(...));
     }
 
-    /**
-     * Flush the cached route keys for a tenant after it is saved.
-     */
     private function onSave(Model $model): void
     {
         $routeKeyName = $this->routeKeyName($model);
@@ -44,9 +39,6 @@ final readonly class TenantCacheInvalidator
         }
     }
 
-    /**
-     * Flush the cached route key for a tenant after it is deleted.
-     */
     private function onDelete(Model $model): void
     {
         $current = $model->getAttribute($this->routeKeyName($model));
@@ -56,9 +48,6 @@ final readonly class TenantCacheInvalidator
         }
     }
 
-    /**
-     * Get the route key attribute name for the tenant model.
-     */
     private function routeKeyName(Model $model): string
     {
         $configured = config('tenancy.tenant.route_key');

@@ -16,9 +16,6 @@ final readonly class ResolverFactory
 {
     public function __construct(private Application $application) {}
 
-    /**
-     * Build the tenant resolver from configuration.
-     */
     public function make(): TenantResolver
     {
         $config = config('tenancy.resolver');

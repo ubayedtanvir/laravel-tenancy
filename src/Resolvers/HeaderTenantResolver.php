@@ -16,9 +16,6 @@ final readonly class HeaderTenantResolver implements TenantResolver
 {
     public function __construct(private TenantRepository $tenantRepository) {}
 
-    /**
-     * Resolve the tenant from the configured request header.
-     */
     public function resolve(Request $request): ?IsTenant
     {
         $header = config('tenancy.header', 'X-Tenant');

@@ -31,6 +31,9 @@ return [
 
         // only used for plain-string keys
         'key_length' => 36,
+
+        // null => $tenant->getRouteKeyName()
+        'route_key' => null,
     ],
 
     /*
@@ -61,4 +64,35 @@ return [
 
     // Route parameter carrying the tenant route key, e.g. /{tenant}/dashboard
     'route_parameter' => 'tenant',
+
+    // Header read by HeaderTenantResolver
+    'header' => 'X-Tenant',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Current-tenant landing
+    |--------------------------------------------------------------------------
+    |
+    | Routes consumed by the context-persistence middleware. These are landing
+    | preferences only — never an input to scoping or authorization.
+    |
+    */
+
+    'landing_route' => 'tenant.dashboard',
+
+    'switch_confirmation_route' => 'tenant.switch.confirm',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache
+    |--------------------------------------------------------------------------
+    |
+    | Used by the tenant repository (caches route-key => id) and Cache::tenant().
+    |
+    */
+
+    'cache' => [
+        'store' => null,   // null => application default
+        'ttl' => 3600,
+    ],
 ];

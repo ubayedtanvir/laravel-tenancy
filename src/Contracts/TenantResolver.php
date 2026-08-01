@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 interface TenantResolver
 {
     /**
-     * Resolve the tenant for the given request.
-     *
-     * @return IsTenant|null Null means "no tenant in this request".
+     * Resolve the tenant for the given request, or return null if none can be identified.
      */
     public function resolve(Request $request): ?IsTenant;
 }

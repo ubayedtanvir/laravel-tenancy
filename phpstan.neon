@@ -8,3 +8,10 @@ parameters:
         - tests/Fixtures
     excludePaths:
         - src/Database/SchemaBlueprintMixin.php
+    # Prevents PHPDoc-derived types from triggering false positives on
+    # runtime type guards (e.g. is_scalar() on getKey() which returns
+    # int|string per PHPDoc but mixed at native reflection level).
+    treatPhpDocTypesAsCertain: false
+
+    bootstrapFiles:
+        - phpstan-bootstrap.php
