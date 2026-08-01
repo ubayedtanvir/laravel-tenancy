@@ -23,6 +23,8 @@ use UbayedTanvir\LaravelTenancy\TenancyManager;
  * @method static void each(\Closure $callback, int $chunk = 100)
  * @method static void resolveUsing(\Closure $callback)
  * @method static \Closure|null customResolver()
+ * @method static void shouldQueueBeTenantAware(bool $value = true)
+ * @method static bool queueTenantAware()
  * @method static string foreignKey()
  *
  * @see TenancyManager

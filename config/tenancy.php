@@ -92,7 +92,18 @@ return [
     */
 
     'cache' => [
-        'store' => null,   // null => application default
-        'ttl' => 3600,
+        'prefix' => env('TENANCY_CACHE_PREFIX', default: 'tenant'),
+        'store' => env('TENANCY_CACHE_STORE'),   // null => application default
+        'ttl' => env('TENANCY_CACHE_TTL', default: 3600),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queue
+    |--------------------------------------------------------------------------
+    */
+
+    'queue' => [
+        'tenant_aware' => env('TENANCY_QUEUE_TENANT_AWARE', default: true),
     ],
 ];

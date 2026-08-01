@@ -26,6 +26,8 @@ final class TenancyManager
     /** @var (Closure(Request): (IsTenant|null))|null */
     private ?Closure $customResolver = null;
 
+    private ?bool $queueTenantAware = null;
+
     public function initialize(IsTenant $isTenant): void
     {
         if ($this->isTenant instanceof IsTenant
@@ -189,6 +191,19 @@ final class TenancyManager
     public function customResolver(): ?Closure
     {
         return $this->customResolver;
+    }
+
+    /**
+     * Override the 'tenancy.queue.tenant_aware' config value at runtime.
+     */
+    public function shouldQueueBeTenantAware(bool $value = true): void
+    {
+        $this->queueTenantAware = $value;
+    }
+
+    public function queueTenantAware(): bool
+    {
+        return $this->queueTenantAware ?? config()->boolean('tenancy.queue.tenant_aware', default: true);
     }
 
     public function foreignKey(): string

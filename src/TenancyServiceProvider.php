@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace UbayedTanvir\LaravelTenancy;
 
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
+use UbayedTanvir\LaravelTenancy\Cache\TenantCache;
+use UbayedTanvir\LaravelTenancy\Console\RunCommand;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantRepository;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantResolver;
 use UbayedTanvir\LaravelTenancy\Database\EloquentTenantRepository;
@@ -20,6 +25,7 @@ use UbayedTanvir\LaravelTenancy\Http\Middleware\RecordsCurrentTenant;
 use UbayedTanvir\LaravelTenancy\Http\Middleware\RedirectToCurrentTenant;
 use UbayedTanvir\LaravelTenancy\Http\Middleware\RequireExplicitSwitch;
 use UbayedTanvir\LaravelTenancy\Http\Middleware\RequireTenant;
+use UbayedTanvir\LaravelTenancy\Support\TenantQueueBinder;
 
 final class TenancyServiceProvider extends ServiceProvider
 {
@@ -41,12 +47,18 @@ final class TenancyServiceProvider extends ServiceProvider
 
         $this->registerMiddlewareAliases();
         $this->registerTenantCacheInvalidation();
+        $this->registerQueueHooks();
+        $this->registerCacheMacro();
 
         if ($this->app->runningInConsole()) {
             $this->publishes(
                 [__DIR__.'/../config/tenancy.php' => config_path('tenancy.php')],
                 ['tenancy', 'tenancy-config'],
             );
+
+            $this->commands([
+                RunCommand::class,
+            ]);
         }
     }
 
@@ -71,5 +83,25 @@ final class TenancyServiceProvider extends ServiceProvider
         }
 
         $this->app->make(TenantCacheInvalidator::class)->register($model);
+    }
+
+    private function registerQueueHooks(): void
+    {
+        $tenantQueueBinder = new TenantQueueBinder;
+
+        Queue::createPayloadUsing(fn (): array => $tenantQueueBinder->payload());
+        Queue::before(fn (JobProcessing $jobProcessing) => $tenantQueueBinder->restore($jobProcessing));
+        Queue::after(fn () => $tenantQueueBinder->reset());
+        Queue::failing(fn () => $tenantQueueBinder->reset());
+        Queue::exceptionOccurred(fn () => $tenantQueueBinder->reset());
+        Queue::looping(fn () => $tenantQueueBinder->reset());
+    }
+
+    private function registerCacheMacro(): void
+    {
+        CacheRepository::macro('tenant', function (): TenantCache {
+            /** @var CacheRepository $this */
+            return new TenantCache($this, resolve(TenancyManager::class)->idOrFail());
+        });
     }
 }
