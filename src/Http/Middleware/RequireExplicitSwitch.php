@@ -43,10 +43,8 @@ final readonly class RequireExplicitSwitch
         $route = config('tenancy.switch_confirmation_route', 'tenant.switch.confirm');
         $parameter = config('tenancy.route_parameter', 'tenant');
 
-        return to_route(\is_string($route)
-            ? $route
-            : 'tenant.switch.confirm', [
-                (\is_string($parameter) ? $parameter : 'tenant') => $isTenant->getRouteKey(),
-            ]);
+        return to_route(\is_string($route) ? $route : 'tenant.switch.confirm', [
+            (\is_string($parameter) ? $parameter : 'tenant') => $isTenant->getRouteKey(),
+        ]);
     }
 }

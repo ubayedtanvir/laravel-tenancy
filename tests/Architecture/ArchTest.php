@@ -25,6 +25,10 @@ arch('events are final')
     ->expect('UbayedTanvir\LaravelTenancy\Events')
     ->toBeFinal();
 
+arch('middleware are final')
+    ->expect('UbayedTanvir\LaravelTenancy\Http\Middleware')
+    ->toBeFinal();
+
 arch('`TenancyException` extends `RuntimeException`')
     ->expect(TenancyException::class)
     ->toExtend(RuntimeException::class);

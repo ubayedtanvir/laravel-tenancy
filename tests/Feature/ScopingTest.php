@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use UbayedTanvir\LaravelTenancy\Database\LenientModeWarning;
 use UbayedTanvir\LaravelTenancy\Exceptions\TenantContextMissing;
 use UbayedTanvir\LaravelTenancy\Facades\Tenancy;
+use UbayedTanvir\LaravelTenancy\TenancyManager;
 use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Comment;
 use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\LegacyPost;
 use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Post;
@@ -98,4 +99,17 @@ it('respects a per-model foreign key override', function (): void {
     expect(LegacyPost::query()->count())->toBe(1)
         ->and(LegacyPost::query()->first()?->account_id)->toBe($tenant->getKey())
         ->and(LegacyPost::query()->first()?->title)->toBe('a1');
+});
+
+it('does not survive a scoped-instance flush', function (): void {
+    $tenant = Tenant::query()->create(['slug' => 'a']);
+    Tenancy::initialize($tenant);
+
+    expect(resolve(TenancyManager::class)->initialized())->toBeTrue();
+
+    // Octane flushes scoped instances between requests. A singleton would carry
+    // this request's tenant into the next; a scoped binding does not.
+    app()->forgetScopedInstances();
+
+    expect(resolve(TenancyManager::class)->initialized())->toBeFalse();
 });
