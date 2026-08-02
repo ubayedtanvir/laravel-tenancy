@@ -77,6 +77,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TenantResolutionFailed`
 - `TenantContextChanged`
 
+#### AI / Laravel Boost
+- AI guidelines (`resources/boost/guidelines/core.blade.php`) — loaded upfront by Boost with package conventions, key classes, migration macros, and middleware aliases.
+- `laravel-tenancy-development` agent skill — on-demand instructions for scoping models, migrations, middleware, resolvers, cross-tenant queries, queues, cache, and console commands.
+- `laravel-tenancy-testing` agent skill — on-demand instructions for `actingAsTenant()`, `assertTenantIsolated()`, and writing tenant-aware tests.
+
 #### Exceptions
 - `TenancyException` (base)
 - `TenantContextMissing`
