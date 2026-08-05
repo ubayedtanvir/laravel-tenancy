@@ -12,6 +12,7 @@ parameters:
     # runtime type guards (e.g. is_scalar() on getKey() which returns
     # int|string per PHPDoc but mixed at native reflection level).
     treatPhpDocTypesAsCertain: false
+    checkOctaneCompatibility: true
     ignoreErrors:
         - identifier: trait.unused
     bootstrapFiles:

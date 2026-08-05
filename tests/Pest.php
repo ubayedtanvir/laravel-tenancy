@@ -16,11 +16,11 @@ use UbayedTanvir\LaravelTenancy\Tests\TestCase;
 |
 */
 
-uses(TestCase::class)
-    ->in(__DIR__);
-
-pest()->use(RefreshDatabase::class)
+uses(TestCase::class, RefreshDatabase::class)
     ->in('Feature');
+
+uses(TestCase::class)
+    ->in('Architecture');
 
 /*
 |--------------------------------------------------------------------------

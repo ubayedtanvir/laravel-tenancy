@@ -1,6 +1,9 @@
 ---
 name: laravel-tenancy-testing
-description: Test tenant isolation in Laravel applications using ubayedtanvir/laravel-tenancy. Use when writing tests that verify tenant scoping, cross-tenant write guards, context-missing exceptions, or when setting up tenant context in test cases.
+description: "Tests tenant isolation in Laravel applications using ubayedtanvir/laravel-tenancy. Activates when writing tests that verify tenant scoping, cross-tenant write guards, ownership immutability, or context-missing exceptions; when setting up tenant context in test cases with actingAsTenant() or assertTenantIsolated(); when testing tenant-aware queue jobs, middleware, cache, or console commands; or when the user mentions testing tenancy, tenant isolation tests, or multi-tenant test setup in a Laravel project."
+license: MIT
+metadata:
+  author: ubayedtanvir
 ---
 
 # Laravel Tenancy Testing

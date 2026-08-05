@@ -1,6 +1,9 @@
 ---
 name: laravel-tenancy-development
-description: Build single-database multi-tenant Laravel features with ubayedtanvir/laravel-tenancy. Use when adding tenant scoping to models, writing tenant-aware migrations, configuring middleware, resolving tenants, working with cross-tenant queries, tenant-scoped cache, tenant-aware queues, or tenant console commands.
+description: "Develops single-database multi-tenant Laravel applications with ubayedtanvir/laravel-tenancy. Activates when adding the IsTenant interface or BelongsToTenant trait to models; writing migrations with $table->tenant() or $table->currentTenant() macros; configuring tenant middleware (IdentifyTenant, RequireTenant, EnsureTenantMember); setting up tenant resolvers (path, header, chain, or custom); writing cross-tenant queries with crossTenant(), withoutTenancy(), acrossTenants(), or forTenant(); working with tenant-scoped cache via Cache::tenant(); dispatching tenant-aware queue jobs; running artisan commands in tenant context with tenancy:run or InteractsWithTenants; configuring tenant resolution, strict mode, or landing routes; or when the user mentions tenancy, multi-tenancy, tenant isolation, tenant scoping, or row-level tenancy in a Laravel project."
+license: MIT
+metadata:
+  author: ubayedtanvir
 ---
 
 # Laravel Tenancy Development
