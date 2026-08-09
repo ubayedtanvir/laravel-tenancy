@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-09
+
+### Added
+- `switchToDefault()` on `TracksCurrentTenant` — switches the user to their first accessible tenant, or clears the preference if none exist.
+- `URL::defaults()` in `IdentifyTenant` middleware — `route()` helper now auto-fills the tenant parameter without manual passing.
+- `defaultLandingTenant()` improved with `method_exists` duck-typing — users who forget to override get a sensible default from `tenants()->first()` instead of a hard crash.
+
+### Fixed
+- `RedirectToCurrentTenant` no longer causes an infinite redirect loop when applied to the landing route itself.
+- Removed redundant `$this->index()` from `tenant()` migration macro — the foreign key already creates an index.
+- `tenancy:install` now shows `vendor:publish` output for better install feedback.
+
+## [0.1.1] - 2026-08-09
+
+### Changed
+- Internal improvements.
+
+## [0.1.0] - 2026-08-09
+
 ### Added
 
 #### Core
