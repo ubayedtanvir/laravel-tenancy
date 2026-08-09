@@ -31,7 +31,9 @@ final class InstallCommand extends Command
             return self::FAILURE;
         }
 
-        $this->callSilently('vendor:publish', [
+        $this->components->info('Publishing tenancy config…');
+
+        $this->call('vendor:publish', [
             '--tag' => 'tenancy-config',
             '--force' => (bool) $this->option('force'),
         ]);

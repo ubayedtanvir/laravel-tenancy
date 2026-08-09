@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use UbayedTanvir\LaravelTenancy\Concerns\TracksCurrentTenant;
 use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\Tenant;
 use UbayedTanvir\LaravelTenancy\Tests\Fixtures\Models\User;
 
@@ -82,4 +84,58 @@ it('returns null and forgets the preference with no accessible tenant', function
 
     expect($user->resolveLandingTenant())->toBeNull()
         ->and($user->fresh()?->getAttribute('current_tenant_id'))->toBeNull();
+});
+
+it('`switchToDefault()` switches to the first accessible tenant', function (): void {
+    $tenant = Tenant::query()->create(['slug' => 'a']);
+    $b = Tenant::query()->create(['slug' => 'b']);
+    $user = User::query()->create(['name' => 'U']);
+
+    $user->tenants()->attach([$tenant->getKey(), $b->getKey()]);
+    $user->switchTo($b);
+
+    $result = $user->switchToDefault();
+
+    expect($user->fresh()?->getAttribute('current_tenant_id'))->toBe($tenant->getKey())
+        ->and($result)->toBeInstanceOf(User::class);
+});
+
+it('`switchToDefault()` forgets preference when no tenant is accessible', function (): void {
+    $tenant = Tenant::query()->create(['slug' => 'a']);
+    $user = User::query()->create(['name' => 'U']);
+
+    $user->switchTo($tenant);
+
+    $user->switchToDefault();
+
+    expect($user->fresh()?->getAttribute('current_tenant_id'))->toBeNull();
+});
+
+it('`switchToDefault()` ignores current tenant and forces default', function (): void {
+    $tenant = Tenant::query()->create(['slug' => 'a']);
+    $b = Tenant::query()->create(['slug' => 'b']);
+    $user = User::query()->create(['name' => 'U']);
+
+    $user->tenants()->attach([$tenant->getKey(), $b->getKey()]);
+    $user->switchTo($b);
+
+    expect($user->currentTenantIs($b))->toBeTrue();
+
+    $user->switchToDefault();
+
+    expect($user->fresh()?->getAttribute('current_tenant_id'))->toBe($tenant->getKey());
+});
+
+it('`switchToDefault()` throws LogicException when model has no tenants method', function (): void {
+    $model = new class extends Authenticatable
+    {
+        use TracksCurrentTenant;
+
+        protected $guarded = [];
+
+        protected $table = 'users';
+    };
+
+    expect(fn (): object => $model->switchToDefault())
+        ->toThrow(LogicException::class, 'No default landing tenant provided.');
 });

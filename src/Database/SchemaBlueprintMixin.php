@@ -30,8 +30,6 @@ final class SchemaBlueprintMixin
                 ->on(TenantColumn::table())
                 ->cascadeOnDelete();
 
-            $this->index($column);
-
             return $columnDefinition;
         };
     }
@@ -57,7 +55,6 @@ final class SchemaBlueprintMixin
             $column ??= TenantColumn::foreignKey();
 
             $this->dropForeign([$column]);
-            $this->dropIndex([$column]);
             $this->dropColumn($column);
         };
     }

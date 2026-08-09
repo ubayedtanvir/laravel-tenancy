@@ -85,6 +85,21 @@ it('404s a guest', function (): void {
         ->toThrow(NotFoundHttpException::class);
 });
 
+it('sets URL defaults so route helper auto-fills the tenant parameter', function (): void {
+    Tenant::query()->create(['slug' => 'acme']);
+
+    Route::middleware([IdentifyTenant::class, RequireTenant::class])
+        ->get('/{tenant}/dash', fn (): string => 'ok')
+        ->name('tenant.dash');
+
+    Route::middleware([IdentifyTenant::class, RequireTenant::class])
+        ->get('/{tenant}/link', fn (): string => route('tenant.dash'));
+
+    $this->get('/acme/link')
+        ->assertOk()
+        ->assertSee('/acme/dash');
+});
+
 it('treats the tenant-as-user as a member without a pivot', function (): void {
     $tenant = Tenant::query()->create(['slug' => 'solo']);   // Tenant implements IsTenant
     Tenancy::initialize($tenant);

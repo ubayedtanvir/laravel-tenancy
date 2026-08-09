@@ -35,8 +35,14 @@ final readonly class RedirectToCurrentTenant
         $route = config('tenancy.landing_route', 'tenant.dashboard');
         $parameter = config('tenancy.route_parameter', 'tenant');
 
-        return to_route(\is_string($route) ? $route : 'tenant.dashboard', [
+        $target = route(\is_string($route) ? $route : 'tenant.dashboard', [
             (\is_string($parameter) ? $parameter : 'tenant') => $tenant->getRouteKey(),
         ]);
+
+        if ($request->url() === $target) {
+            return $next($request);
+        }
+
+        return redirect($target);
     }
 }

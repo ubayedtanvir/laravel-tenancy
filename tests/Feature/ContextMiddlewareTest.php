@@ -86,6 +86,24 @@ it('redirects to confirmation when the tenant differs from the preference', func
         ->assertSessionHas('tenancy.intended');
 });
 
+it('does not redirect when already at the landing route', function (): void {
+    config(['tenancy.landing_route' => 'tenant.dash']);
+
+    $tenant = Tenant::query()->create(['slug' => 'a']);
+    $user = User::query()->create(['name' => 'U']);
+
+    $user->tenants()->attach($tenant);
+    $user->switchTo($tenant);
+
+    Route::middleware([RedirectToCurrentTenant::class])
+        ->get('/{tenant}/dash', fn (): string => 'ok')
+        ->name('tenant.dash');
+
+    $this->actingAs($user)->get('/a/dash')
+        ->assertOk()
+        ->assertSee('ok');
+});
+
 it('reports first-tenant and external-navigation on the event', function (): void {
     $tenant = Tenant::query()->create(['slug' => 'a']);
     $from = Tenant::query()->create(['slug' => 'b']);

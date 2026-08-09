@@ -159,6 +159,11 @@ Tenancy::end()                       // void
 Tenancy::runFor($tenant, fn () => …) // runs callback, restores previous
 Tenancy::each(fn ($t) => …)          // all tenants, chunked
 Tenancy::crossTenant(fn () => …)     // suspends scope
+
+$user->switchTo($tenant)             // record landing preference
+$user->switchToDefault()             // switch to first accessible tenant
+$user->forgetCurrentTenant()         // clear landing preference
+$user->resolveLandingTenant()        // ?IsTenant — self-heals stale prefs
 ```
 
 ## Queues
@@ -226,6 +231,21 @@ final class User extends Authenticatable implements TenantMembership
 Migration: `$table->currentTenant()`.
 
 Middleware: add `tenant.record` to record visits, `tenant.landing` to redirect to last tenant.
+
+Key methods on `TracksCurrentTenant`:
+
+```php
+$user->switchTo($tenant);         // record landing preference
+$user->switchToDefault();         // switch to first accessible tenant (or forget if none)
+$user->forgetCurrentTenant();     // clear landing preference
+$user->resolveLandingTenant();    // ?IsTenant — self-heals stale preferences
+```
+
+When a tenant is deleted, reassign affected users:
+
+```php
+$team->members->each(fn ($user) => $user->switchToDefault());
+```
 
 ## Configuration
 

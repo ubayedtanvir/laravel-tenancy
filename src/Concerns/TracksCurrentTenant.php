@@ -84,6 +84,19 @@ trait TracksCurrentTenant
         return $this;
     }
 
+    public function switchToDefault(): static
+    {
+        $fallback = $this->defaultLandingTenant();
+
+        if ($fallback !== null) {
+            $this->switchTo($fallback);
+        } else {
+            $this->forgetCurrentTenant();
+        }
+
+        return $this;
+    }
+
     /**
      * Resolve the user's landing tenant, healing a stale preference if necessary.
      *
@@ -108,9 +121,18 @@ trait TracksCurrentTenant
         return $fallback;
     }
 
+    /**
+     * Override this method to provide a default landing tenant.
+     */
     protected function defaultLandingTenant(): ?IsTenant
     {
-        return $this instanceof IsTenant ? $this : null;
+        if (method_exists($this, 'tenants')) {
+            $tenant = $this->tenants()->first();
+
+            return $tenant instanceof IsTenant ? $tenant : null;
+        }
+
+        throw new \LogicException('No default landing tenant provided.');
     }
 
     private function canAccessTenant(IsTenant $isTenant): bool

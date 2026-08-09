@@ -312,12 +312,17 @@ final class User extends Authenticatable implements TenantMembership
 $table->currentTenant();   // nullable, nullOnDelete
 ```
 
-Add `RecordsCurrentTenant` to your middleware stack to keep the preference up to date on each GET request. Use the `tenant.landing` middleware on your landing route to redirect users to their last tenant (self-heals if that tenant was deleted or the user lost access).
+Add `RecordsCurrentTenant` to your middleware stack to keep the preference up to date on each GET request. Use the `tenant.landing` middleware on your landing route to redirect users to their last tenant (self-heals if that tenant was deleted or the user lost access). When a tenant is deleted, switch affected users to their next available tenant:
 
 ```php
 Route::middleware(['auth', 'tenant.landing'])
     ->get('/dashboard', fn () => abort(404))
     ->name('dashboard');
+```
+
+```php
+// When a tenant is deleted, reassign its members:
+$team->members->each(fn ($user) => $user->switchToDefault());
 ```
 
 This preference is only used for landing — never for scoping or authorization. The URL is always authoritative.
@@ -363,6 +368,11 @@ Model::query()->withoutTenancy()
 Model::query()->acrossTenants()
 Model::query()->forTenant($tenant)
 
+$user->switchTo($tenant)             // record landing preference
+$user->switchToDefault()             // switch to first accessible tenant
+$user->forgetCurrentTenant()         // clear landing preference
+$user->resolveLandingTenant()        // ?IsTenant — self-heals stale prefs
+
 Cache::tenant()->get($key)
 Cache::tenant()->put($key, $value)
 Cache::tenant()->remember($key, $ttl, $callback)
@@ -370,14 +380,14 @@ Cache::tenant()->remember($key, $ttl, $callback)
 
 ## Middleware Aliases
 
-| Alias | Class |
-|---|---|
-| `tenant` | `IdentifyTenant` |
-| `tenant.required` | `RequireTenant` |
-| `tenant.member` | `EnsureTenantMember` |
-| `tenant.record` | `RecordsCurrentTenant` |
-| `tenant.landing` | `RedirectToCurrentTenant` |
-| `tenant.strict-switch` | `RequireExplicitSwitch` |
+| Alias | Class | Purpose |
+|---|---|---|
+| `tenant` | `IdentifyTenant` | Resolves and binds the tenant from the request |
+| `tenant.required` | `RequireTenant` | Returns 404 when no tenant is bound |
+| `tenant.member` | `EnsureTenantMember` | Returns 404 if the user isn't a member |
+| `tenant.record` | `RecordsCurrentTenant` | Saves the tenant as the user's landing preference |
+| `tenant.landing` | `RedirectToCurrentTenant` | Redirects to the user's last-visited tenant |
+| `tenant.strict-switch` | `RequireExplicitSwitch` | Requires explicit confirmation to switch tenants |
 
 ---
 

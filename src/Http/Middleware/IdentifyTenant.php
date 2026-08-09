@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 use UbayedTanvir\LaravelTenancy\Concerns\BelongsToTenant;
 use UbayedTanvir\LaravelTenancy\Contracts\TenantResolver;
@@ -60,6 +61,8 @@ final readonly class IdentifyTenant
         if ($route instanceof Route && $route->hasParameter($parameter)) {
             $route->setParameter($parameter, $tenant);
         }
+
+        URL::defaults([$parameter => $tenant->getRouteKey()]);
 
         return $next($request);
     }
