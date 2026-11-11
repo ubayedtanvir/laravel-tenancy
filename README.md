@@ -391,6 +391,76 @@ Cache::tenant()->remember($key, $ttl, $callback)
 
 ---
 
+## Common Pitfalls
+
+These aren't enforced by the package, but each one comes up in real applications.
+
+### Name nested route parameters carefully
+
+The tenant route parameter (`tenancy.route_parameter`, `tenant` by default) is reserved. `IdentifyTenant` always replaces it with the resolved tenant. If a route needs a second instance of your tenant model, give that parameter its own name.
+
+Laravel also scopes a nested route binding to the parameter before it when the nested parameter uses a custom key (`{team:id}`) or the route calls `scopeBindings()`. It finds the child through a relation guessed from the parameter name, so on the route below Laravel looks the team up through `$user->teams()`. If that relation doesn't exist, or means something else, the route returns 404.
+
+Turn the scoping off for that route and authorize explicitly instead, because the scoping was acting as your ownership check:
+
+```php
+Route::get('/members/{user}/teams/{team:id}', ShowMemberTeam::class)
+    ->withoutScopedBindings()
+    ->can('view', 'team');
+```
+
+If the custom key is the model's route key anyway, `{team}` without `:id` avoids the scoping altogether.
+
+### Use `scoped()`, not `singleton()`, for anything tenant-aware
+
+Octane and queue workers keep the application in memory between requests and jobs. A `singleton()` that holds the current tenant, or anything derived from it, keeps the first tenant and serves it to the next one. Laravel resets `scoped()` bindings between requests and jobs, which is why the package registers its own services that way.
+
+```php
+$this->app->scoped(TenantBilling::class);    // fresh for every request and job
+$this->app->singleton(TenantBilling::class); // leaks one tenant into the next
+```
+
+The same applies to static properties and to values captured in the constructor of a long-lived service: read `Tenancy::current()` when you need it, not when the object is built. Larastan's `checkOctaneCompatibility` option flags many of these cases.
+
+### Keep tenant 404s uniform
+
+When a request has no tenant, or the user isn't a member, the package returns a plain 404. That's deliberate: an unknown tenant and one you can't access must look identical, or the response tells an outsider which tenants exist. Keep it that way in your exception handling:
+
+- Don't turn tenant 404s into a redirect with a flash message, or give them their own page. Any difference from your normal 404 gives away which tenants exist.
+- Keep your error pages tenant-agnostic. Don't read the current tenant, query tenant-scoped models, or call `route()` for a tenant route without passing the tenant explicitly.
+
+### Impersonating users
+
+Impersonate by logging in as the user, the way impersonation packages swap the authenticated user on the guard. Then the tenant still comes from the URL and membership is still checked against the impersonated user, so staff see exactly what that user sees and nothing more. Don't use `Tenancy::crossTenant()` or `Tenancy::initialize()` to impersonate, and don't add a staff bypass to `tenant.member`.
+
+A few things to handle in your app:
+
+- **Don't change the user's landing preference.** `tenant.record` saves the current tenant as the user's preference on every page view, so browsing as the user moves their landing tenant. Skip recording while impersonating:
+
+  ```php
+  final class RecordsCurrentTenantUnlessImpersonating
+  {
+      public function __construct(private RecordsCurrentTenant $recorder) {}
+
+      public function handle(Request $request, Closure $next): Response
+      {
+          if ($request->session()->has('impersonated_by')) {   // your impersonation check
+              return $next($request);
+          }
+
+          return $this->recorder->handle($request, $next);
+      }
+  }
+  ```
+
+  The same goes for calls to `switchTo()` in your own code, such as a team switcher.
+
+- **Start and stop impersonation outside tenant routes.** After starting, redirect to your `tenant.landing` route so the user's own landing tenant is picked. After stopping, redirect to a staff page. Returning to the tenant URL you were on gives the staff member a 404 unless they're a member.
+
+- **Record who really acted.** While impersonating, `$request->user()` is the impersonated user, and queued jobs carry the tenant but not the impersonator. If an audit trail or a job needs to know who acted, pass the impersonator's id along explicitly.
+
+---
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for recent changes.

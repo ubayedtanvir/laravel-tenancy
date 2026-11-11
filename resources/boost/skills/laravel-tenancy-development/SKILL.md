@@ -1,6 +1,6 @@
 ---
 name: laravel-tenancy-development
-description: "Develops single-database multi-tenant Laravel applications with ubayedtanvir/laravel-tenancy. Activates when adding the IsTenant interface or BelongsToTenant trait to models; writing migrations with $table->tenant() or $table->currentTenant() macros; configuring tenant middleware (IdentifyTenant, RequireTenant, EnsureTenantMember); setting up tenant resolvers (path, header, chain, or custom); writing cross-tenant queries with crossTenant(), withoutTenancy(), acrossTenants(), or forTenant(); working with tenant-scoped cache via Cache::tenant(); dispatching tenant-aware queue jobs; running artisan commands in tenant context with tenancy:run or InteractsWithTenants; configuring tenant resolution, strict mode, or landing routes; or when the user mentions tenancy, multi-tenancy, tenant isolation, tenant scoping, or row-level tenancy in a Laravel project."
+description: "Develops single-database multi-tenant Laravel applications with ubayedtanvir/laravel-tenancy. Activates when adding the IsTenant interface or BelongsToTenant trait to models; writing migrations with $table->tenant() or $table->currentTenant() macros; configuring tenant middleware (IdentifyTenant, RequireTenant, EnsureTenantMember); setting up tenant resolvers (path, header, chain, or custom); writing cross-tenant queries with crossTenant(), withoutTenancy(), acrossTenants(), or forTenant(); working with tenant-scoped cache via Cache::tenant(); dispatching tenant-aware queue jobs; running artisan commands in tenant context with tenancy:run or InteractsWithTenants; configuring tenant resolution, strict mode, or landing routes; handling tenant 404 responses; defining nested route bindings on tenant routes; registering tenant-aware services for Octane or queue workers; implementing user impersonation; or when the user mentions tenancy, multi-tenancy, tenant isolation, tenant scoping, or row-level tenancy in a Laravel project."
 license: MIT
 metadata:
   author: ubayedtanvir
@@ -246,6 +246,63 @@ When a tenant is deleted, reassign affected users:
 ```php
 $team->members->each(fn ($user) => $user->switchToDefault());
 ```
+
+## Common Pitfalls
+
+### Tenant 404s
+
+Missing tenant context and non-membership both return a plain 404, so an unknown tenant and a forbidden one look identical. Keep it that way:
+
+- Never convert tenant 404s into a redirect with a flash or toast message, and never give them a different page from the app's normal 404. Any difference reveals which tenants exist.
+- Error pages must not read the current tenant, query tenant-scoped models, or call `route()` for tenant routes without an explicit tenant argument.
+
+### Route parameters and scoped bindings
+
+- The tenant route parameter (`tenancy.route_parameter`) is reserved; `IdentifyTenant` replaces it with the resolved tenant. Name any other parameter of the tenant model differently.
+- Laravel scopes a nested binding when it uses a custom key (`{team:id}`) or the route calls `scopeBindings()`, resolving it through a relation guessed from the parameter name (`$user->teams()` for `{user}/teams/{team:id}`). If that relation doesn't exist or means something else, the route 404s. Opt out on that route and authorize explicitly:
+
+```php
+Route::get('/members/{user}/teams/{team:id}', ShowMemberTeam::class)
+    ->withoutScopedBindings()
+    ->can('view', 'team');
+```
+
+### Long-running processes
+
+Octane and queue workers reuse the container between requests and jobs. Bind anything that holds or derives from the current tenant with `scoped()`, never `singleton()`:
+
+```php
+$this->app->scoped(TenantBilling::class);
+```
+
+Do not store the current tenant in static properties or capture it in a long-lived constructor. Call `Tenancy::current()` where the value is used.
+
+### Impersonation
+
+Impersonate by swapping the authenticated user on the guard (as impersonation packages do). The tenant then still comes from the URL and `tenant.member` checks the impersonated user's membership, so staff see exactly what that user sees.
+
+- Never impersonate with `Tenancy::crossTenant()` or `Tenancy::initialize()`, and never add a staff bypass to `tenant.member`.
+- Skip `tenant.record` while impersonating, or browsing as the user overwrites their landing preference. Wrap the middleware:
+
+```php
+final class RecordsCurrentTenantUnlessImpersonating
+{
+    public function __construct(private RecordsCurrentTenant $recorder) {}
+
+    public function handle(Request $request, Closure $next): Response
+    {
+        if ($request->session()->has('impersonated_by')) {   // the app's impersonation check
+            return $next($request);
+        }
+
+        return $this->recorder->handle($request, $next);
+    }
+}
+```
+
+- Avoid `switchTo()` calls (for example a team switcher) during impersonation for the same reason.
+- Start and stop impersonation on non-tenant routes. After starting, redirect to the `tenant.landing` route; after stopping, redirect to a staff page, not the tenant URL.
+- `$request->user()` is the impersonated user and queued jobs carry only the tenant. Pass the impersonator's id explicitly to anything that audits who acted.
 
 ## Configuration
 

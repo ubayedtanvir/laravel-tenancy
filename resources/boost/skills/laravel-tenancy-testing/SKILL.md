@@ -135,6 +135,22 @@ it('requires tenant membership', function () {
 });
 ```
 
+Tenant 404s must not reveal which tenants exist. Assert that an unknown tenant and a tenant the user cannot access return the same response:
+
+```php
+it('returns the same 404 for unknown and forbidden tenants', function () {
+    $team = Team::factory()->create();
+    $user = User::factory()->create();   // not a member of $team
+
+    $unknown = $this->actingAs($user)->get('/does-not-exist/dashboard');
+    $forbidden = $this->actingAs($user)->get("/{$team->slug}/dashboard");
+
+    $unknown->assertNotFound();
+    $forbidden->assertNotFound();
+    expect($forbidden->getContent())->toBe($unknown->getContent());
+});
+```
+
 ## Testing Console Commands
 
 Test tenant-scoped artisan commands:
